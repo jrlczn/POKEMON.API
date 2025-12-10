@@ -1,0 +1,83 @@
+import 'package:flutter/material.dart';
+import '../models/pokemon.dart';
+import '../services/pokemon_service.dart';
+
+class PokemonDetailPage extends StatefulWidget {
+  final String name;
+
+  const PokemonDetailPage({super.key, required this.name});
+
+  @override
+  State<PokemonDetailPage> createState() => _PokemonDetailPageState();
+}
+
+class _PokemonDetailPageState extends State<PokemonDetailPage> {
+  final PokemonService service = PokemonService();
+  PokemonDetail? detail;
+  bool loading = true;
+  String aiText = "";
+
+  @override
+  void initState() {
+    super.initState();
+    loadDetail();
+  }
+
+  Future<void> loadDetail() async {
+    try {
+      final data = await service.fetchPokemonDetail(widget.name);
+      setState(() {
+        detail = data;
+        loading = false;
+      });
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
+  }
+
+  String generateFakeAI() {
+    if (detail == null) return "";
+    return "${detail!.name.toUpperCase()} is a powerful Pokémon with types ${detail!.types.join(", ")}. It is known for its unique abilities and strong battle style.";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.name.toUpperCase())),
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : detail == null
+          ? const Center(child: Text("No data"))
+          : Padding(
+              padding: const EdgeInsets.all(16),
+              child: ListView(
+                children: [
+                  if (detail!.imageUrl.isNotEmpty)
+                    Image.network(detail!.imageUrl, height: 200),
+                  const SizedBox(height: 10),
+                  Text("TYPES: ${detail!.types.join(", ")}"),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "STATS:",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  ...detail!.stats.entries.map(
+                    (e) => Text("${e.key}: ${e.value}"),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        aiText = generateFakeAI();
+                      });
+                    },
+                    child: const Text("Generate AI Description"),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(aiText),
+                ],
+              ),
+            ),
+    );
+  }
+}
