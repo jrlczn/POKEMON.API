@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/pokemon.dart';
 import '../services/pokemon_service.dart';
+import '../widgets/pokemon_card_widget.dart';
 
 class PokemonDetailPage extends StatefulWidget {
   final String name;
@@ -52,19 +53,10 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
               padding: const EdgeInsets.all(16),
               child: ListView(
                 children: [
-                  if (detail!.imageUrl.isNotEmpty)
-                    Image.network(detail!.imageUrl, height: 200),
-                  const SizedBox(height: 10),
-                  Text("TYPES: ${detail!.types.join(", ")}"),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "STATS:",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  ...detail!.stats.entries.map(
-                    (e) => Text("${e.key}: ${e.value}"),
-                  ),
+                  PokemonCardWidget(detail: detail!),
+
                   const SizedBox(height: 20),
+
                   ElevatedButton(
                     onPressed: () {
                       setState(() {
@@ -73,6 +65,7 @@ class _PokemonDetailPageState extends State<PokemonDetailPage> {
                     },
                     child: const Text("Generate AI Description"),
                   ),
+
                   const SizedBox(height: 10),
                   Text(aiText),
                 ],

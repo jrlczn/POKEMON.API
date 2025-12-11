@@ -3,6 +3,7 @@ import '../models/pokemon.dart';
 import '../services/pokemon_service.dart';
 import 'pokemon_detail_page.dart';
 import 'settings_page.dart';
+import '../widgets/pokemon_list_item.dart';
 
 class PokemonListPage extends StatefulWidget {
   const PokemonListPage({super.key});
@@ -84,9 +85,8 @@ class _PokemonListPageState extends State<PokemonListPage> {
                     itemCount: filtered.length,
                     itemBuilder: (context, index) {
                       final p = filtered[index];
-                      return ListTile(
-                        leading: const Icon(Icons.catching_pokemon),
-                        title: Text(p.name.toUpperCase()),
+                      return PokemonListItem(
+                        pokemon: p,
                         onTap: () {
                           Navigator.push(
                             context,
