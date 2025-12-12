@@ -1,14 +1,19 @@
+// lib/widgets/pokemon_list_item.dart
 import 'package:flutter/material.dart';
 import '../models/pokemon.dart';
 
 class PokemonListItem extends StatelessWidget {
   final Pokemon pokemon;
   final VoidCallback onTap;
+  final VoidCallback onToggleFavorite;
+  final bool isFavorite;
 
   const PokemonListItem({
     super.key,
     required this.pokemon,
     required this.onTap,
+    required this.onToggleFavorite,
+    required this.isFavorite,
   });
 
   @override
@@ -23,7 +28,20 @@ class PokemonListItem extends StatelessWidget {
           pokemon.name.toUpperCase(),
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(
+                isFavorite ? Icons.favorite : Icons.favorite_border,
+                color: isFavorite ? Colors.yellow[700] : Colors.red,
+              ),
+              onPressed: onToggleFavorite,
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.arrow_forward_ios, size: 16),
+          ],
+        ),
         onTap: onTap,
       ),
     );

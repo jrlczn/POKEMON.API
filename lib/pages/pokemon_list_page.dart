@@ -4,9 +4,12 @@ import '../services/pokemon_service.dart';
 import 'pokemon_detail_page.dart';
 import 'settings_page.dart';
 import '../widgets/pokemon_list_item.dart';
+import '../data/favorites.dart' as favs;
 
 class PokemonListPage extends StatefulWidget {
-  const PokemonListPage({super.key});
+  final VoidCallback onToggleDarkMode; // <-- Step 3 adds this
+
+  const PokemonListPage({super.key, required this.onToggleDarkMode});
 
   @override
   State<PokemonListPage> createState() => _PokemonListPageState();
@@ -54,6 +57,32 @@ class _PokemonListPageState extends State<PokemonListPage> {
         title: const Text('Pokémon API App'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.brightness_6),
+            onPressed: widget.onToggleDarkMode,
+          ),
+          IconButton(
+            icon: const Icon(Icons.favorite, color: Colors.pink),
+            onPressed: () {
+              setState(() {
+                // Toggle between showing favorites and all
+                if (filtered.length == pokemons.length) {
+                  // show favorites only
+                  filtered = favs.favoritePokemon
+                      .map(
+                        (name) => pokemons.firstWhere(
+                          (p) => p.name == name,
+                          orElse: () => pokemons.first,
+                        ),
+                      )
+                      .where((p) => favs.favoritePokemon.contains(p.name))
+                      .toList();
+                } else {
+                  filtered = pokemons;
+                }
+              });
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
@@ -87,6 +116,16 @@ class _PokemonListPageState extends State<PokemonListPage> {
                       final p = filtered[index];
                       return PokemonListItem(
                         pokemon: p,
+                        isFavorite: favs.favoritePokemon.contains(p.name),
+                        onToggleFavorite: () {
+                          setState(() {
+                            if (favs.favoritePokemon.contains(p.name)) {
+                              favs.favoritePokemon.remove(p.name);
+                            } else {
+                              favs.favoritePokemon.add(p.name);
+                            }
+                          });
+                        },
                         onTap: () {
                           Navigator.push(
                             context,
